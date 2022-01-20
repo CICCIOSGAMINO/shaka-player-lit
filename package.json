@@ -1,0 +1,40 @@
+{
+  "name": "shaka-player-lit",
+  "version": "1.0.0",
+  "description": "Integrate shaka-player into Lit WebComponent",
+  "main": "shaka-player-lit.js",
+  "type": "module",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "dev": "web-dev-server --node-resolve --app-index examples/index.html --watch --open",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CICCIOSGAMINO/shaka-player-lit.git"
+  },
+  "keywords": [
+    "Shaka-Player",
+    "ShakaPlayer",
+    "Shaka",
+    "Player",
+    "Adaptive",
+    "Media",
+    "DASH",
+    "HLS"
+  ],
+  "author": "@cicciosgamino",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/CICCIOSGAMINO/shaka-player-lit/issues"
+  },
+  "homepage": "https://github.com/CICCIOSGAMINO/shaka-player-lit#readme",
+  "dependencies": {
+    "lit": "^2.1.1"
+  },
+  "devDependencies": {
+    "@web/dev-server": "^0.1.28"
+  }
+}

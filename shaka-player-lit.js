@@ -107,11 +107,14 @@ export class ShakaPlayerLit extends LitElement {
 
 	render () {
 		return html`
+		<figure>
 			<video
 				.autoplay=${this.autoplay}
 				.controls=${this.controls}
 				.muted=${this.muted}
+				.preload=${this.preload}
 			></video>
+		</figure>
 		`
 	}
 }

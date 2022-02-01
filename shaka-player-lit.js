@@ -33,11 +33,28 @@ export class ShakaPlayerLit extends LitElement {
 		`
 	}
 
+	static get properties () {
+		return {
+			controls: { type: Boolean },
+			autoplay: { type: Boolean },
+			muted: { type: Boolean },
+			playing: { type: Boolean },
+			loading: { type: Boolean },
+			manifestUri: { 
+				type : String,
+				attribute: 'manifest-uri',
+				reflect: true
+			}
+		}
+	}
+
 	constructor () {
 		super()
 		// init the property
+		this.controls = false
 		this.autoplay = false
 		this.loading = false
+		this.playing = false
 		this.muted = false
 		/**
      * Video preload attribute.
@@ -49,7 +66,14 @@ export class ShakaPlayerLit extends LitElement {
 
 	connectedCallback () {
 		super.connectedCallback()
-		console.log('@CONNECTED')
+		// fullscreen
+		document.addEventListener('fullscreenchange',
+			this.onFullscreenChange)
+	}
+
+	onFullscreenChange () {
+		this.fullscreen = document.fullscreenElement
+		console.log(`@FULLSCREEN >> ${this.fullscreen}`)
 	}
 
 	firstUpdated () {
@@ -71,50 +95,84 @@ export class ShakaPlayerLit extends LitElement {
 		this.player = new shaka.Player(this.video)
 
 		// init listeners on player
-		this.player.addEventListener('error', this.#onError)
+		this.player.addEventListener('error', this.#onShakaError)
 
-		console.log(this.player.getNetworkingEngine())
+		// TODO
+		console.log(this.player.GetPlayerVersion)
+		// console.log(this.player.getNetworkingEngine())
 
 		// try to load a manifest
-		const manifestUri =
-    'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd'
-
 		try {
-			await this.player.load(manifestUri)
+			await this.player.load(this.manifestUri)
 			// DEBUG
 			console.log('@VIDEO >> Loaded')
 		} catch (e) {
-			this.#onError(e)
+			this.#onShakaError(e)
 		}
 	}
 
-	#onError (e) {
+	/**
+	 * 
+	 * @param {object} shaka player error
+	 */
+	#onShakaError (error) {
 		const Severity = shaka.util.Error.Severity
 		const Category = shaka.util.Error.Category
 		const Code = shaka.util.Error.Code
-		console.error(
-			`@PLAYER-ERROR >> ${e}\n` +
-			`@SEVERITY >> ${getKeyByValue(Severity, e.severity)}\n` +
-			`@CATEGORY >> ${getKeyByValue(Category, e.category)}\n` +
-			`@CODE >> ${getKeyByValue(Code, e.code)}\n`
-		)
+
+		const msg =
+			`@PLAYER-ERROR >> ${error}\n` +
+			`@SEVERITY >> ${getKeyByValue(Severity, error.severity)}\n` +
+			`@CATEGORY >> ${getKeyByValue(Category, error.category)}\n` +
+			`@CODE >> ${getKeyByValue(Code, error.code)}\n`
+
 		// fire the shaka-player-error event
 		const ce = new CustomEvent('shaka-player-error', {
-			detail: e
+			detail: {
+				error,
+				msg
+			}
 		})
 		this.dispatchEvent(ce)
+	}
+
+	/**
+	 * public method used to configure the shaka player as in official docs
+	 * https://shaka-player-demo.appspot.com/docs/api/tutorial-config.html
+	 * @param { object | string } configurationObj
+	 * @param { any } value of single field if configurationObject is a string
+	 */
+	configure (configurationObj = {}, value = null) {
+		this.player.configure(configurationObj, value)
+	}
+
+	getConfiguration () {
+		return this.player.getConfiguration()
+	}
+
+	onloadstart (event) {
+		console.log(`@FULLSCREEN >> ${event}`)
+	}
+
+	onVolumeChange (event) {
+		console.log(event)
 	}
 
 	render () {
 		return html`
 		<figure>
 			<video
-				.autoplay=${this.autoplay}
-				.controls=${this.controls}
-				.muted=${this.muted}
+				?autoplay=${this.autoplay}
+				?controls=${this.controls}
+				?muted=${this.muted}
 				.preload=${this.preload}
-			></video>
+				@fullscreenchange=${this.onLoadstart}
+				@volumechange=${this.onVolumeChange}>
+			<slot></slot>
+		</video>
 		</figure>
+
+		<!-- @DEBUG stuff -->
 		`
 	}
 }

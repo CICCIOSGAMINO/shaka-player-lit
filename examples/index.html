@@ -62,8 +62,14 @@
 
   <main>
     <shaka-player-lit
-
-    ></shaka-player-lit>
+      controls
+      autoplay
+      manifest-uri='https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd'>
+      <!-- Providing sources for auto load - Try this first -->
+      <source src='https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd'/>
+      <!-- Try this if the first one has failed -->
+      <source src='https://storage.googleapis.com/shaka-demo-assets/angel-one-hls-apple/master.m3u8'/>
+    </shaka-player-lit>
   </main>
 
   <noscript>
@@ -75,12 +81,65 @@
 
   <script type="module">
     window.addEventListener('DOMContentLoaded', () => {
-      // listening for the events fired from shaka-player-lit component
       const s = document.querySelector('shaka-player-lit')
-      s.addEventListener('shaka-player-error', (e) => {
-        // @DEBUG
-        // console.log(`@SHAKA-PLAYER-ERROR >> ${e.detail}`)
+
+      // listening for the shaka-player-error event
+      s.addEventListener('shaka-player-error', (event) => {
+        /** 
+         * @DEBUG shaka errors, error is the native shaka error,
+         * msg is a custom debug message
+         * {
+         *    detail: {
+         *      error,
+         *       msg
+         *    }
+         * }
+        */
+        console.error(event.detail.msg) // console the message
+        // console.error(event.detail.error) console the shaka error object
       })
+
+      // ------------------------ Example configurations ----------------------
+      // Some of these fields have immediate effects (such as networking 
+      // settings and buffering settings) while some will not have any effect
+      // until the next call to load() (such as DRM settings, manifest settings
+      // and language settings).
+
+      // no effects
+      s.configure()
+
+      // set streaming.bufferingGoal to 120
+      s.configure('streaming.bufferingGoal', 120)
+
+      // set audio language preference to Canadian French:
+      s.configure('preferredAudioLanguage', 'fr-CA')
+      // NOTE: language preferences affect the next call to load()
+
+      // set text language preference to Greek and buffering goal to 2 minutes:
+      s.configure({
+        preferredTextLanguage: 'el',
+        streaming: {
+          bufferingGoal: 120
+        }
+      })
+
+      // check audio language preference, which is still Canadian French:
+      s.getConfiguration().preferredAudioLanguage // fr-CA
+
+      // check buffering goal, which is 2 minutes:
+      s.getConfiguration().streaming.bufferingGoal  // 120
+
+      // check rebuffering goal, which is still the default of 2 seconds:
+      // s.getConfiguration().streaming.rebufferingGoal
+
+      // set the rebuffering goal to 15 seconds and revert buffering goal to default:
+      s.configure({
+        streaming: {
+          bufferingGoal: undefined,
+          rebufferingGoal: 15
+        }
+      })
+
     })
   </script>
 

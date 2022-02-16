@@ -4,7 +4,20 @@ v0.0.1 - 01-02-2022
 
 Lit WebComponent wrapper around Shaka Player. Actually the Shaka Player is not a dependency (not a module) and only the js script is linked. The Shaka version used in the imported script is:
 
-Shaka Player > 
+Shaka Player > v3.0.0
+
+```bash
+Project Structure
+	|__ 📂 Video - DASH & HSL files
+	|__ 📂 Examples - use case examples
+	|__ 📂 lib\n
+			|__ shaka-player.compiled.js, *.map, utils.js
+	|
+	|__ 📜 shaka-player-lit.js	- Lit WebComponent
+	|__ 📜 README.md	
+	|__ 📜 CHANGELOG.md
+```
+
 
 # Providing \<source\> for auto load
 It's also possible to provide the \<source\> tag inside the \<video\> element to enable auto loading of the specified content.
